@@ -1,6 +1,21 @@
 #include <Arduino.h>
 #include "linalg.h"
 
+void print(mat m) {
+	Serial.print(m.x11);
+	Serial.print(" ");
+	Serial.println(m.x12);
+	Serial.print(m.x21);
+	Serial.print(" ");
+	Serial.println(m.x22);
+}
+
+void print(vec v) {
+	Serial.print(v.x1);
+	Serial.print(" ");
+	Serial.println(v.x2);
+}
+
 vec prod(mat m, vec v) {
 	vec val;
 	val.x1 = m.x11*v.x1 + m.x12*v.x2;
@@ -41,7 +56,7 @@ mat sum(mat m1, mat m2) {
 vec sum(vec v1, vec v2) {
 	vec val;
 	val.x1 = v1.x1 + v2.x1;
-	val.x1 = v2.x2 + v2.x2;
+	val.x2 = v1.x2 + v2.x2;
 	return val;
 }
 

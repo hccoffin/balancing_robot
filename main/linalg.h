@@ -12,6 +12,9 @@ struct vec {
 	float x2;
 };
 
+void print(mat m);
+void print(vec v);
+
 vec prod(mat m, vec v);
 vec prod(float s, vec v);
 mat prod(mat m1, mat m2);

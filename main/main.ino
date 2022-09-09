@@ -28,10 +28,10 @@ size_t delta_index;
 float prev_control = 0;
 
 // Kalman filter stuff
-const float sigma_theta2 = 5*5;
+const float sigma_theta2 = 2*2;
 const float sigma_thetadot2 = .2*.2;
-const float process_theta2 = 1*1;
-const float process_thetadot2 = 5*5;
+const float process_theta2 = .2*.2;
+const float process_thetadot2 = 1*1;
 vec x;
 mat Fmat = (mat){1, 1, 0, 1};
 mat Hmat = (mat){1, 0, 0, 1};
@@ -71,27 +71,29 @@ void updateState () {
 	xyzFloat gValue = myMPU6500.getGValues();
 	xyzFloat gyr = myMPU6500.getGyrValues();
 
-	vec z = (vec){atan2(-gValue.x, gValue.z), gyr.z};
+	vec z = (vec){atan2(-gValue.x, gValue.z)*180/PI, gyr.z};
 	x = prod(Fmat, x);
 	Pmat = sum(prod(Fmat, prod(Pmat, trans(Fmat))), Qmat);
 	mat Smat = sum(prod(Hmat, prod(Pmat, trans(Hmat))), Rmat);
 	mat Kmat = prod(Pmat, prod(trans(Hmat), inv(Smat)));
 	x = sum(x, prod(Kmat, sum(z, prod(Hmat, prod(-1, x)))));
+	print(x);
 	Pmat = prod(sum(identity, prod(-1, prod(Kmat, Hmat))), Pmat);
 
-	Serial.print("Accel:");
-	Serial.print(gValue.z);
-	Serial.print(" Accel-x:");
-	Serial.print(gValue.x);
-	Serial.print(" Gyro:");
-	Serial.print(gyr.z);
-	Serial.print(" Angle:");
-	Serial.print(atan2(-gValue.x, gValue.z));
-	Serial.print(" theta:");
-	Serial.print(x.x1);
-	Serial.print(" theta_dot:");
-	Serial.print(x.x2);
-	Serial.println("");
+
+//	Serial.print("Accel:");
+//	Serial.print(gValue.z);
+//	Serial.print(" Accel-x:");
+//	Serial.print(gValue.x);
+//	Serial.print(" Gyro:");
+//	Serial.print(z.x2);
+//	Serial.print(" Angle:");
+//	Serial.print(z.x1);
+//	Serial.print(" theta:");
+//	Serial.print(x.x1);
+//	Serial.print(" theta_dot:");
+//	Serial.print(x.x2);
+//	Serial.println("");
 }
 
 void setup() {
@@ -113,11 +115,10 @@ void setup() {
 
 	updateState();
 
-//  http.setReuse(true);
-	wifiMulti.addAP("myluco-fiber", "0123456789abcdef01deadbeef");
-	while (!wifiMulti.run() == WL_CONNECTED) {
-		Serial.println("Didn't Connect.");
-	}
+//	wifiMulti.addAP("myluco-fiber", "0123456789abcdef01deadbeef");
+//	while (!wifiMulti.run() == WL_CONNECTED) {
+//		Serial.println("Didn't Connect.");
+//	}
 	
 	// set default values for p, i, d, setpoint to 0 and set all values in deltas to 0
 	p = 0;
@@ -130,17 +131,17 @@ void setup() {
 	delta_summed = 0;
 	
 	// get PID setpoint once and then start readHttp task
-	requestPIDSetpoint(p, i, d, setpoint);
-	xTaskCreatePinnedToCore(
-			readHttpTaskLoop, /* Function to implement the task */
-			"readHttpTask", /* Name of the task */
-			10000,  /* Stack size in words */
-			NULL,  /* Task input parameter */
-			0,  /* Priority of the task */
-			&readHttpTask,  /* Task handle. */
-			0); /* Core where the task should run */
-		
-	delay(1000);
+//	requestPIDSetpoint(p, i, d, setpoint);
+//	xTaskCreatePinnedToCore(
+//			readHttpTaskLoop, /* Function to implement the task */
+//			"readHttpTask", /* Name of the task */
+//			10000,  /* Stack size in words */
+//			NULL,  /* Task input parameter */
+//			0,  /* Priority of the task */
+//			&readHttpTask,  /* Task handle. */
+//			0); /* Core where the task should run */
+//		
+//	delay(1000);
 }
 
 void loop() {
@@ -158,8 +159,6 @@ void loop() {
 	deltas[delta_index] = delta;
 
 	float control = p*delta + d*delta_diff + i*delta_summed;
-//	control = constrain(control, prev_control - 10, prev_control + 10);
-//	prev_control = control;
 	
 //	Serial.print("val: ");
 //	Serial.print(gValue.z, 4);
