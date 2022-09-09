@@ -41,37 +41,17 @@ mat Rmat = (mat){sigma_theta2, 0, 0, sigma_thetadot2};
 mat identity = (mat){1, 0, 0, 1};
 
 void requestPIDSetpoint(float &p, float &i, float &d, float &setpoint) {
-//  long ts = millis();
 	if((wifiMulti.run() == WL_CONNECTED)) {
 		http.begin("192.168.1.68", 8000, "/pidsetpoint");
 		int httpCode = http.GET();
-//    Serial.println("");
-//    Serial.println("");
-//    Serial.println("");
-//    Serial.print("time: ");
-//    Serial.print(millis() - ts);
-//    Serial.print(" Code: ");
-//    Serial.print(httpCode);
-//    Serial.print(" Size: ");
-//    Serial.println(http.getSize());
 		
 		if(httpCode == HTTP_CODE_OK) {
 			WiFiClient data = http.getStream();
-//      Serial.print("Bytes Available: ");
-//      Serial.println(data.available());
 			uint8_t bytes[16];
 			while(data.available() != 16) {
-//        Serial.print(".");
 				delay(10);
 			}
-//      Serial.println();
 			data.read(bytes, 16);
-//      Serial.print("Read: ");
-//      for (int i = 0; i < 16; i++) {
-//        Serial.print(bytes[i]);
-//        Serial.print(" ");
-//      }
-//      Serial.println("");
 			memcpy(&p, &bytes, sizeof(float));
 			memcpy(&i, &bytes[4], sizeof(float));
 			memcpy(&d, &bytes[8], sizeof(float));
