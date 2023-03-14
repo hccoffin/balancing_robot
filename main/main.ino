@@ -20,7 +20,7 @@ int16_t prev_duty = 0;
 float p = 9.4;
 float i = 4.5;
 float d = 2.65;
-float setpoint = .155; // radians
+float setpoint = .13; //.155; // radians
 float err_int = 0;
 float decay_rate = .9;
 
@@ -107,7 +107,7 @@ void update_kalman_filter (BLA::Matrix<3> z, float dt_seconds) {
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial);
+//  while (!Serial);
   imu = new IMU();
   motor_driver = new L298n(pwma, fora, reva, pwmb, forb, revb);
   previous_micros = micros();
